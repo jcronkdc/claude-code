@@ -22,6 +22,7 @@ import { createNewProject } from "./features/project-templates";
 import { getPromptsLibrary } from "./features/prompts";
 import { getConversationHistory } from "./features/history";
 import { autoFixImports } from "./features/smart-imports";
+import { showCLIStatus, importCLIConfigs, runSetupWizard } from "./cli";
 
 // Cost-saving optimizations
 import {
@@ -190,6 +191,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     vscode.commands.registerCommand("claudeCode.generateTests", () => executeCodeAction("tests")),
     vscode.commands.registerCommand("claudeCode.fixError", () => executeCodeAction("fix")),
     vscode.commands.registerCommand("claudeCode.reviewCode", () => executeCodeAction("review")),
+    
+    // CLI integration
+    vscode.commands.registerCommand("claudeCode.checkCLIs", () => showCLIStatus()),
+    vscode.commands.registerCommand("claudeCode.importCLIKeys", () => importFromCLIs()),
+    vscode.commands.registerCommand("claudeCode.setupWizard", () => runSetupWizard()),
     
     statusBarItem,
     costStatusItem,
@@ -972,6 +978,35 @@ async function exportCostReport(): Promise<void> {
   await vscode.window.showTextDocument(doc);
 
   vscode.window.showInformationMessage(`Cost report exported to ${filePath}`);
+}
+
+/**
+ * Import API keys from CLIs
+ */
+async function importFromCLIs(): Promise<void> {
+  const result = await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: "Importing CLI configurations...",
+    },
+    () => importCLIConfigs()
+  );
+
+  if (result.imported.length > 0) {
+    vscode.window.showInformationMessage(
+      `Imported: ${result.imported.join(", ")}`
+    );
+    
+    // Reinitialize providers with new keys
+    const provider = getProviderManager();
+    await provider.reinitialize();
+  } else if (result.errors.length > 0) {
+    vscode.window.showErrorMessage(result.errors.join("; "));
+  } else {
+    vscode.window.showInformationMessage(
+      "No new API keys found. Set ANTHROPIC_API_KEY, OPENAI_API_KEY, or GROQ_API_KEY environment variables."
+    );
+  }
 }
 
 /**

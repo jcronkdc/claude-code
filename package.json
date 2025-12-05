@@ -129,6 +129,18 @@
       {
         "command": "claudeCode.exportCosts",
         "title": "Claude Code: Export Cost Report"
+      },
+      {
+        "command": "claudeCode.checkCLIs",
+        "title": "Claude Code: Check CLI Configurations"
+      },
+      {
+        "command": "claudeCode.importCLIKeys",
+        "title": "Claude Code: Import API Keys from CLIs"
+      },
+      {
+        "command": "claudeCode.setupWizard",
+        "title": "Claude Code: Setup Wizard"
       }
     ],
     "viewsContainers": {
