@@ -1,10 +1,10 @@
 /**
  * Anti-Bloat Engine
- * 
+ *
  * The core philosophy: MAXIMIZE USER EFFICIENCY, not API consumption
- * 
+ *
  * This module actively detects and prevents patterns that waste time/money:
- * 
+ *
  * 1. VAGUE RESPONSES - AI says "I updated the file" but shows nothing
  * 2. OVER-ENGINEERING - Simple request → complex abstraction
  * 3. REGENERATION WASTE - 1 line change → entire file rewritten
@@ -14,15 +14,15 @@
  * 7. WRONG MODEL - Simple task → expensive model
  */
 
-import * as vscode from "vscode";
 import * as crypto from "crypto";
+import * as vscode from "vscode";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ANTI-PATTERN DETECTION
 // ═══════════════════════════════════════════════════════════════════════════
 
 export interface DetectedIssue {
-  type: 
+  type:
     | "vague_response"
     | "over_engineering"
     | "regeneration_waste"
@@ -43,16 +43,33 @@ export interface DetectedIssue {
  */
 export function detectVagueResponse(response: string): DetectedIssue | null {
   const vaguePatterns = [
-    { pattern: /I('ve| have) (updated|modified|changed|fixed) (the|your) /i, msg: "Claims to update but may not show code" },
-    { pattern: /Here('s| is) (the|your) (updated|modified|new) /i, msg: "May not include actual code" },
-    { pattern: /I('ll| will) (update|modify|change|fix) /i, msg: "States intention but hasn't done it" },
-    { pattern: /You (can|should|could) (try|use|add) /i, msg: "Suggests action without doing it" },
-    { pattern: /Let me know if (you need|you want|that) /i, msg: "Deflects rather than completes" },
+    {
+      pattern: /I('ve| have) (updated|modified|changed|fixed) (the|your) /i,
+      msg: "Claims to update but may not show code",
+    },
+    {
+      pattern: /Here('s| is) (the|your) (updated|modified|new) /i,
+      msg: "May not include actual code",
+    },
+    {
+      pattern: /I('ll| will) (update|modify|change|fix) /i,
+      msg: "States intention but hasn't done it",
+    },
+    {
+      pattern: /You (can|should|could) (try|use|add) /i,
+      msg: "Suggests action without doing it",
+    },
+    {
+      pattern: /Let me know if (you need|you want|that) /i,
+      msg: "Deflects rather than completes",
+    },
   ];
 
   // Check if response has actual code
   const hasCodeBlock = /```[\s\S]*?```/.test(response);
-  const hasFilePath = /`[^`]+\.(ts|js|py|tsx|jsx|css|html|json)`/.test(response);
+  const hasFilePath = /`[^`]+\.(ts|js|py|tsx|jsx|css|html|json)`/.test(
+    response
+  );
   const hasLineNumbers = /line \d+|:\d+:/i.test(response);
 
   for (const { pattern, msg } of vaguePatterns) {
@@ -91,7 +108,7 @@ export function detectOverEngineering(
   const promptWords = prompt.split(/\s+/).length;
 
   // Simple prompt indicators
-  const isSimpleRequest = 
+  const isSimpleRequest =
     promptWords < 20 ||
     /^(add|fix|change|update|rename|move|delete)/i.test(prompt) ||
     /simple|quick|just|only/i.test(prompt);
@@ -100,12 +117,27 @@ export function detectOverEngineering(
 
   // Check for over-engineering in response
   const overEngineeringPatterns = [
-    { pattern: /abstract\s+(class|factory|base)/i, msg: "Creating abstractions for simple task" },
-    { pattern: /implements\s+\w+Interface/i, msg: "Adding interfaces unnecessarily" },
+    {
+      pattern: /abstract\s+(class|factory|base)/i,
+      msg: "Creating abstractions for simple task",
+    },
+    {
+      pattern: /implements\s+\w+Interface/i,
+      msg: "Adding interfaces unnecessarily",
+    },
     { pattern: /generic.*<T>/i, msg: "Adding generics for simple task" },
-    { pattern: /DependencyInjection|IoC|Container/i, msg: "Adding DI for simple task" },
-    { pattern: /EventEmitter|Observable|Subject/i, msg: "Adding reactive patterns unnecessarily" },
-    { pattern: /Strategy|Factory|Singleton|Observer/i, msg: "Adding design patterns for simple task" },
+    {
+      pattern: /DependencyInjection|IoC|Container/i,
+      msg: "Adding DI for simple task",
+    },
+    {
+      pattern: /EventEmitter|Observable|Subject/i,
+      msg: "Adding reactive patterns unnecessarily",
+    },
+    {
+      pattern: /Strategy|Factory|Singleton|Observer/i,
+      msg: "Adding design patterns for simple task",
+    },
   ];
 
   for (const { pattern, msg } of overEngineeringPatterns) {
@@ -114,7 +146,8 @@ export function detectOverEngineering(
         type: "over_engineering",
         severity: "medium",
         message: msg,
-        suggestion: "Ask: 'Can you simplify this? I just need a basic implementation'",
+        suggestion:
+          "Ask: 'Can you simplify this? I just need a basic implementation'",
       };
     }
   }
@@ -479,7 +512,8 @@ export function getMetrics(): SessionMetrics & {
       : 0;
 
   const totalCost = metrics.estimatedCost + metrics.estimatedSavings;
-  const savingsPercent = totalCost > 0 ? (metrics.estimatedSavings / totalCost) * 100 : 0;
+  const savingsPercent =
+    totalCost > 0 ? (metrics.estimatedSavings / totalCost) * 100 : 0;
 
   return {
     ...metrics,
@@ -540,13 +574,17 @@ export function showEfficiencyDashboard(): void {
     <div class="card">
       <h3>CACHE HIT RATE</h3>
       <div class="value">${m.cacheHitRate.toFixed(0)}%</div>
-      <div class="label">${m.requestsCached} of ${m.requestsMade} requests cached</div>
+      <div class="label">${m.requestsCached} of ${
+    m.requestsMade
+  } requests cached</div>
     </div>
     
     <div class="card">
       <h3>TOKENS SAVED</h3>
       <div class="value">${m.tokensSaved.toLocaleString()}</div>
-      <div class="label">vs ${(m.tokensUsed + m.tokensSaved).toLocaleString()} total</div>
+      <div class="label">vs ${(
+        m.tokensUsed + m.tokensSaved
+      ).toLocaleString()} total</div>
     </div>
     
     <div class="card">
@@ -558,7 +596,9 @@ export function showEfficiencyDashboard(): void {
     <div class="card">
       <h3>ACTUAL COST</h3>
       <div class="value neutral">$${m.estimatedCost.toFixed(2)}</div>
-      <div class="label">Without optimization: $${(m.estimatedCost + m.estimatedSavings).toFixed(2)}</div>
+      <div class="label">Without optimization: $${(
+        m.estimatedCost + m.estimatedSavings
+      ).toFixed(2)}</div>
     </div>
     
     <div class="card">
