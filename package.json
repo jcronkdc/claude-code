@@ -141,6 +141,14 @@
       {
         "command": "claudeCode.setupWizard",
         "title": "Claude Code: Setup Wizard"
+      },
+      {
+        "command": "claudeCode.createRepo",
+        "title": "Claude Code: Create GitHub Repository"
+      },
+      {
+        "command": "claudeCode.pushToGitHub",
+        "title": "Claude Code: Push to GitHub"
       }
     ],
     "viewsContainers": {

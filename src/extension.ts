@@ -22,7 +22,7 @@ import { createNewProject } from "./features/project-templates";
 import { getPromptsLibrary } from "./features/prompts";
 import { getConversationHistory } from "./features/history";
 import { autoFixImports } from "./features/smart-imports";
-import { showCLIStatus, importCLIConfigs, runSetupWizard } from "./cli";
+import { showCLIStatus, importCLIConfigs, runSetupWizard, createRepoInteractive, quickPush } from "./cli";
 
 // Cost-saving optimizations
 import {
@@ -196,6 +196,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     vscode.commands.registerCommand("claudeCode.checkCLIs", () => showCLIStatus()),
     vscode.commands.registerCommand("claudeCode.importCLIKeys", () => importFromCLIs()),
     vscode.commands.registerCommand("claudeCode.setupWizard", () => runSetupWizard()),
+    
+    // GitHub integration
+    vscode.commands.registerCommand("claudeCode.createRepo", () => createRepoInteractive()),
+    vscode.commands.registerCommand("claudeCode.pushToGitHub", () => quickPush()),
     
     statusBarItem,
     costStatusItem,

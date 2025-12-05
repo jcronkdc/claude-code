@@ -472,3 +472,14 @@ export async function runSetupWizard(): Promise<void> {
 
 // Export singleton functions
 export { checkAllCLIs as getCLIStatuses };
+
+// Re-export GitHub functions
+export {
+  checkGitHubAuth,
+  createGitHubRepo,
+  createRepoInteractive,
+  quickPush,
+  pushToGitHub,
+  listRepos,
+  cloneRepo,
+} from "./github";
